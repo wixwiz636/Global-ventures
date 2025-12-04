@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WhatsApp Post & Earn — Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6fbff; --card:#fff; --accent:#0b76ff; --muted:#6b7280; --success:#16a34a;
+    --danger:#ef4444; --glass: rgba(255,255,255,0.6);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#eef9ff,#f6fbff);color:#07203a}
+  header{display:flex;justify-content:space-between;align-items:center;padding:16px;max-width:980px;margin:0 auto}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#0b76ff,#3bd3ff);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;box-shadow:0 6px 20px rgba(11,118,255,0.12)}
+  .actions{display:flex;gap:8px}
+  button{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(11,118,255,0.12)}
+  main{max-width:980px;margin:14px auto;padding:12px}
+  .hero{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:12px;background:linear-gradient(90deg,rgba(11,118,255,0.06),rgba(59,211,255,0.03));box-shadow:0 8px 30px rgba(3,27,51,0.03)}
+  .hero h1{margin:0;font-size:20px}
+  .hero p{margin:0;color:var(--muted)}
+  .layout{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-top:14px}
+  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(10,30,60,0.06)}
+  .product-img{width:100%;height:200px;border-radius:10px;background-size:cover;background-position:center;display:block}
+  .product-title{font-weight:700;margin-top:10px}
+  .product-price{color:var(--accent);font-weight:700;margin-top:6px}
+  .row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .muted{color:var(--muted);font-size:13px}
+  .small{font-size:13px}
+  .wallet{padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);display:flex;flex-direction:column;gap:8px}
+  .wallet-balance{font-weight:800;font-size:20px;color:#05203a}
+  .list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .btn-wide{width:100%}
+  .disabled{opacity:0.45;pointer-events:none}
+  footer{max-width:980px;margin:18px auto;padding:12px;color:var(--muted)}
+  /* modal */
+  .modal-back{position:fixed;inset:0;background:rgba(5,10,20,0.36);display:none;align-items:center;justify-content:center;z-index:999}
+  .modal{width:100%;max-width:520px;background:var(--card);padding:16px;border-radius:12px}
+  .flex{display:flex;gap:8px;align-items:center}
+  input[type="text"],input[type="email"],input[type="number"],textarea,select{
+    width:100%;padding:10px;border-radius:8px;border:1px solid #e6f0ff;background:#fbfeff
+  }
+  .note{font-size:13px;color:var(--muted)}
+  .copy{background:#f1f8ff;border:1px dashed rgba(11,118,255,0.12);padding:8px;border-radius:8px;color:var(--accent);cursor:pointer}
+  .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef6ff;color:#0b76ff;font-weight:700;font-size:12px}
+  .watermark{position:fixed;right:10px;bottom:10px;background:rgba(255,255,255,0.8);padding:8px;border-radius:8px;border:1px solid rgba(11,118,255,0.07);font-size:12px}
+  @media(max-width:920px){
+    .layout{grid-template-columns:1fr; }
+    .product-img{height:180px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">WP</div>
+    <div>
+      <div style="font-weight:800">WhatsApp Post & Earn</div>
+      <div class="muted" style="font-size:13px">Demo landing page — client-side only</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="openModal('register')">Register</button>
+    <button class="ghost" onclick="openModal('login')">Login</button>
+    <button class="ghost" onclick="openModal('admin')">Admin</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero card">
+    <h1>Post one product daily on WhatsApp and earn</h1>
+    <p class="muted">Get a daily product to share, upload proof of views and earn per verified view. This demo shows UI interactions — real verification and payments require a backend.</p>
+    <div class="row">
+      <div class="badge">One product / day</div>
+      <div class="muted small">Processing fee required before first withdrawal</div>
+      <div style="margin-left:auto" class="muted small">Paybill: <strong>4084333</strong> • Acc: <strong>7150677</strong></div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <div>
+      <div class="card">
+        <div id="productCard">
+          <!-- product will be injected -->
+        </div>
+
+        <div style="margin-top:12px" class="muted small">How it works: Download image → Post on WhatsApp (status or contact) → Take screenshot of status showing the eye icon and views → Upload here for verification → If valid, wallet gets credited.</div>
+
+        <hr style="margin:12px 0;border:none;height:1px;background:#eef7ff">
+
+        <div class="row">
+          <button onclick="startShare()" id="shareBtn">Share to WhatsApp</button>
+          <button class="ghost" onclick="copyReferral()">Copy referral link</button>
+          <button onclick="openModal('upload')" class="ghost">Upload screenshot</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-weight:700">Submission & Verification</div>
+          <div class="muted small">Demo validation: keyword & number checks</div>
+        </div>
+
+        <div style="margin-top:10px" class="list">
+          <div class="note">You may either upload an image screenshot <strong>or</strong> paste the WhatsApp status text/message containing the post link. For demo OCR/validation, paste the message containing the word <strong>paystack</strong> and the view/amount number if required.</div>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="card wallet">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="muted">Wallet balance</div>
+            <div class="wallet-balance" id="walletBalance">KES 0</div>
+            <div class="muted small">Referral ID: <span id="userRef">-</span></div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted small">Users</div>
+            <div style="font-weight:800">1,232,490</div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px" class="list">
+          <button id="withdrawBtn" class="btn-wide ghost disabled" onclick="initiateWithdraw()">Withdraw</button>
+          <button class="btn-wide ghost" onclick="openModal('history')">Transactions</button>
+          <button class="btn-wide" onclick="openModal('getproduct')">Get today's product</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div style="font-weight:700">Quick Links</div>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+          <button class="ghost" onclick="openModal('faq')">How to post</button>
+          <button class="ghost" onclick="openModal('terms')">Terms & Privacy</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div class="muted small">Demo only — This page simulates the user experience for a WhatsApp Post & Earn platform. Real-world deployment must use server-side verification, secure payment handling and legal compliance.</div>
+</footer>
+
+<div class="watermark">DEMO — NOT LIVE</div>
+
+<!-- Modals -->
+<div id="modal" class="modal-back" onclick="closeModal(event)">
+  <div class="modal" id="modalContent" onclick="event.stopPropagation()">
+    <!-- dynamic modal content -->
+  </div>
+</div>
+
+<script>
+/* Demo data & simple client-side simulation logic */
+
+const PROCESSING_FEE = 500; // KES processing fee demo (change as required)
+const PAYBILL = '4084333';
+const ACCOUNT = '7150677';
+
+let user = {
+  loggedIn: false,
+  email: null,
+  ref: generateRef(),
+  balance: 0,
+  feePaid: false,
+  todaysProductAssigned: false,
+  assignedProduct: null
+};
+
+function generateRef(){ return 'REF' + Math.random().toString(36).slice(2,9).toUpperCase() }
+
+document.getElementById('userRef').textContent = user.ref;
+renderProductCard();
+
+/* Mock product generator (one per day) */
+function assignProductForToday(){
+  if(user.todaysProductAssigned) return user.assignedProduct;
+  const products = [
+    { title:'Smart Headphones', price:1500, img: 'https://images.unsplash.com/photo-1518444023872-1b7f46b6f4f4?auto=format&fit=crop&w=800&q=60' },
+    { title:'Portable Charger', price:950, img: 'https://images.unsplash.com/photo-1499084732479-de2c02d45fc4?auto=format&fit=crop&w=800&q=60' },
+    { title:'Leather Wallet', price:800, img: 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=800&q=60' },
+    { title:'Bluetooth Speaker', price:1200, img:'https://images.unsplash.com/photo-1518444023872-1b7f46b6f4f4?auto=format&fit=crop&w=800&q=60' }
+  ];
+  const pick = products[Math.floor(Math.random()*products.length)];
+  user.assignedProduct = { ...pick, id: 'P'+Date.now() };
+  user.todaysProductAssigned = true;
+  return user.assignedProduct;
+}
+
+function renderProductCard(){
+  const p = assignProductForToday();
+  const el = document.getElementById('productCard');
+  el.innerHTML = `
+    <div style="display:flex;flex-direction:column">
+      <div class="product-img" id="prodImg" style="background-image:url('${p.img}');"></div>
+      <div class="product-title">${p.title}</div>
+      <div class="product-price">KES ${p.price}</div>
+      <div class="muted small">Assigned product for today • ID: <strong>${p.id}</strong></div>
+      <div class="row">
+        <button onclick="downloadProduct()">Download</button>
+        <button class="ghost" onclick="openModal('shareInstructions')">How to share</button>
+      </div>
+    </div>
+  `;
+}
+
+/* Download simulation */
+function downloadProduct(){
+  const link = document.createElement('a');
+  link.href = (user.assignedProduct && user.assignedProduct.img) || '#';
+  link.download = (user.assignedProduct && user.assignedProduct.title) || 'product.jpg';
+  document.body.appendChild(link); link.click(); link.remove();
+  alert('Downloaded product image (demo). Post it on WhatsApp and capture screenshot to upload for verification.');
+}
+
+/* Sharing to WhatsApp with referral link */
+function startShare(){
+  const refLink = getReferralLink();
+  const text = encodeURIComponent(`Welcome to WhatsApp Post & Earn! Get this product and start earning. Join with my link: ${refLink}`);
+  const url = `https://wa.me/?text=${text}`;
+  window.open(url,'_blank');
+}
+
+/* Referral link */
+function getReferralLink(){
+  const base = location.href.split('?')[0];
+  return `${base}?ref=${user.ref}&prod=${user.assignedProduct.id}`;
+}
+function copyReferral(){
+  const t = getReferralLink();
+  navigator.clipboard?.writeText(t).then(()=>alert('Referral link copied to clipboard'));
+}
+
+/* Modal management */
+function openModal(name){
+  const back = document.getElementById('modal');
+  const content = document.getElementById('modalContent');
+  back.style.display='flex';
+  content.innerHTML = modalContentFor(name);
+}
+function closeModal(e){
+  if(e){ document.getElementById('modal').style.display='none'; }
+}
+function modalContentFor(name){
+  if(name==='register'){
+    return `
+      <h3>Register (Demo)</h3>
+      <p class="note">Email will be used for login and notifications. No real accounts created in this demo.</p>
+      <label>Email<input type="email" id="regEmail" placeholder="you@example.com"></label>
+      <label>Full name<input type="text" id="regName" placeholder="Your name"></label>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="doRegister()">Create account</button>
+        <button class="ghost" onclick="closeModal()">Cancel</button>
+      </div>
+    `;
+  }
+  if(name==='login'){
+    return `
+      <h3>Login (Demo)</h3>
+      <label>Email<input type="email" id="loginEmail" placeholder="you@example.com"></label>
+      <label>Password<input type="password" id="loginPass" placeholder="password"></label>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="doLogin()">Login</button>
+        <button class="ghost" onclick="closeModal()">Cancel</button>
+      </div>
+    `;
+  }
+  if(name==='admin'){
+    return `
+      <h3>Admin Login</h3>
+      <p class="note">Admin panel is demo-only. Use demo credentials.</p>
+      <label>Email<input type="email" id="adminEmail" placeholder="admin email"></label>
+      <label>Password<input type="password" id="adminPass" placeholder="password"></label>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="doAdminLogin()">Enter Admin</button>
+        <button class="ghost" onclick="closeModal()">Cancel</button>
+      </div>
+    `;
+  }
+  if(name==='upload'){
+    return `
+      <h3>Upload Proof of Views</h3>
+      <p class="note">Upload screenshot of your WhatsApp status showing the eye icon and view count or paste the status/message text below.</p>
+      <label>Upload image<input type="file" id="proofFile" accept="image/*"></label>
+      <label>Or paste status/message text<textarea id="proofText" rows="4" placeholder="Paste the WhatsApp status text or payment message here"></textarea></label>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="submitProof()">Submit for verification</button>
+        <button class="ghost" onclick="closeModal()">Cancel</button>
+      </div>
+    `;
+  }
+  if(name==='history'){
+    return `
+      <h3>Transactions (Demo)</h3>
+      <div class="note">This is a mock transaction history.</div>
+      <ul id="txList">
+        <li>No transactions yet.</li>
+      </ul>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button class="ghost" onclick="closeModal()">Close</button>
+      </div>
+    `;
+  }
+  if(name==='getproduct'){
+    return `
+      <h3>Get Today's Product</h3>
+      <p class="note">Click to re-assign today's product (demo). Users receive one product per day.</p>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="reassignProduct()">Assign product</button>
+        <button class="ghost" onclick="closeModal()">Close</button>
+      </div>
+    `;
+  }
+  if(name==='shareInstructions'){
+    return `
+      <h3>How to share</h3>
+      <ol>
+        <li>Download the assigned product image.</li>
+        <li>Post it to your WhatsApp Status or send to your contacts.</li>
+        <li>Open your status, view the eye icon and ensure the view count increases.</li>
+        <li>Take a clear screenshot showing the eye icon and count and upload here for verification.</li>
+      </ol>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button class="ghost" onclick="closeModal()">Close</button>
+      </div>
+    `;
+  }
+  if(name==='faq'){
+    return `
+      <h3>FAQ (Demo)</h3>
+      <div class="note">This platform is a frontend demo. Real verification/payments must be implemented server-side.</div>
+      <ul>
+        <li>How much per view? Demo: KES 100 per verified view (configurable).</li>
+        <li>Withdrawals require processing fee (demo): KES ${PROCESSING_FEE} via Paybill ${PAYBILL} Acc ${ACCOUNT}.</li>
+      </ul>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button class="ghost" onclick="closeModal()">Close</button>
+      </div>
+    `;
+  }
+  if(name==='terms'){
+    return `
+      <h3>Terms & Privacy (Demo)</h3>
+      <div class="note">This is a demo. No real money transfers occur. For production, implement secure backend, KYC and legal compliance.</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button class="ghost" onclick="closeModal()">Close</button>
+      </div>
+    `;
+  }
+  return `<div>Not implemented</div>`;
+}
+
+/* Registration & login (demo) */
+function doRegister(){
+  const email = document.getElementById('regEmail').value.trim();
+  const name = document.getElementById('regName').value.trim();
+  if(!email || !name){ alert('Please fill name and email'); return; }
+  user.loggedIn = true; user.email = email; user.name = name;
+  user.ref = user.ref || generateRef();
+  document.getElementById('userRef').textContent = user.ref;
+  alert('Account created (demo). You are logged in as ' + email);
+  closeModal();
+}
+function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  if(!email){ alert('Enter email'); return; }
+  user.loggedIn = true; user.email = email;
+  user.ref = user.ref || generateRef();
+  document.getElementById('userRef').textContent = user.ref;
+  alert('Logged in (demo) as ' + email);
+  closeModal();
+}
+
+/* Admin login check */
+function doAdminLogin(){
+  const email = document.getElementById('adminEmail').value.trim();
+  const pass = document.getElementById('adminPass').value;
+  if(email==='collinsrono359@gmail.com' && pass==='Co129235'){
+    alert('Admin login successful (demo). Admin features are not implemented in frontend demo.');
+    closeModal();
+    return;
+  }
+  alert('Access denied (admin only).');
+}
+
+/* Submit proof simulation */
+function submitProof(){
+  const file = document.getElementById('proofFile').files[0];
+  const text = document.getElementById('proofText').value.trim();
+  if(!file && !text){ alert('Upload an image or paste status/text'); return; }
+
+  // Simulated "AI" verification:
+  // - If pasted text contains 'paystack' and number '500' or '50' (demo rules) -> success (for fee proof)
+  // - If pasted text contains 'views' or 'eye' and some digits -> treat as view proof success
+  // - If file uploaded -> accept as "pending manual review" (mock)
+  let result = { ok:false, reason:'Could not validate automatically. Pending review.' };
+
+  if(text){
+    const t = text.toLowerCase();
+    // check for payment screenshot message
+    if(t.includes('paystack') && (t.includes('500') || t.includes('50') || t.includes('1000'))){
+      result = { ok:true, reason:'Payment proof detected (demo).' };
+      user.feePaid = true;
+      enableWithdrawIfEligible();
+    } else if(/\bview(s)?\b/.test(t) || /\beye\b/.test(t) || /\bviews?\s*\d{1,5}/.test(t)){
+      // detect numeric views
+      const num = (t.match(/\d{1,5}/) || [0])[0];
+      const credit = Number(num) * 100; // demo rate KES100 per view
+      if(num>0){ user.balance += credit; result = { ok:true, reason:`${num} views detected — credited KES ${credit}` } }
+      enableWithdrawIfEligible();
+    } else {
+      result = { ok:false, reason:'Text uploaded not matching expected patterns.' }
+    }
+  } else if(file){
+    // simple file name heuristic (demo only)
+    const f = file.name.toLowerCase();
+    if(f.includes('paystack') && (f.includes('500') || f.includes('50') || f.includes('1000'))){
+      user.feePaid = true;
+      result = { ok:true, reason:'Payment screenshot filename suggests paystack payment (demo).' };
+      enableWithdrawIfEligible();
+    } else {
+      result = { ok:false, reason:'Image received — pending manual verification (demo).' };
+    }
+  }
+
+  // update UI & history
+  if(result.ok){
+    user.balance = Math.round(user.balance);
+    document.getElementById('walletBalance').textContent = 'KES ' + user.balance;
+    addTransaction({type:'credit', amount: result.amount || 0, note: result.reason});
+    alert('Verification result: ' + result.reason);
+  } else {
+    alert('Verification result: ' + result.reason);
+  }
+  closeModal();
+}
+
+/* Transaction list (demo) */
+function addTransaction(tx){
+  const list = document.getElementById('txList');
+  if(list){
+    const li = document.createElement('li');
+    li.textContent = `${new Date().toLocaleString()} — ${tx.note || 'Activity'}`;
+    list.prepend(li);
+  }
+}
+
+/* Withdraw logic (demo) */
+function enableWithdrawIfEligible(){
+  const btn = document.getElementById('withdrawBtn');
+  if(user.balance >= 100 && user.feePaid){ // min withdraw & fee
+    btn.classList.remove('disabled');
+    btn.classList.remove('ghost');
+  } else {
+    btn.classList.add('disabled');
+  }
+}
+function initiateWithdraw(){
+  if(!user.loggedIn){ alert('Please register/login first (demo)'); return; }
+  if(!user.feePaid){ alert(`Withdrawal locked. Please pay processing fee of KES ${PROCESSING_FEE} using Paybill ${PAYBILL} Acc ${ACCOUNT} and upload proof.`); openModal('upload'); return; }
+  if(user.balance < 100){ alert('Minimum withdrawal is KES 100 (demo)'); return; }
+  // open withdraw form (demo)
+  openModalContent(`
+    <h3>Withdraw (Demo)</h3>
+    <label>Amount<input type="number" id="wdAmount" value="${Math.min(user.balance,1000)}"></label>
+    <label>Method
+      <select id="wdMethod">
+        <option>Mpesa</option>
+        <option>Airtel Money</option>
+        <option>Bank Transfer</option>
+      </select>
+    </label>
+    <label>Account/Phone<input type="text" id="wdAccount" placeholder="Enter account or phone"></label>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="confirmWithdraw()">Submit Withdrawal</button>
+      <button class="ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+}
+
+function openModalContent(html){
+  const back = document.getElementById('modal');
+  const content = document.getElementById('modalContent');
+  back.style.display='flex';
+  content.innerHTML = html;
+}
+
+/* Confirm withdrawal (demo) */
+function confirmWithdraw(){
+  const amt = Number(document.getElementById('wdAmount').value);
+  if(amt<=0 || amt>user.balance){ alert('Invalid amount'); return; }
+  user.balance -= amt;
+  document.getElementById('walletBalance').textContent = 'KES ' + user.balance;
+  addTransaction({type:'debit', amount:amt, note:`Withdraw request KES ${amt} (demo)`});
+  alert('Withdrawal request submitted (demo). Admin will process it (not implemented).');
+  closeModal();
+}
+
+/* Other helpers */
+function reassignProduct(){ user.todaysProductAssigned = false; user.assignedProduct = null; renderProductCard(); alert('Product re-assigned (demo)'); closeModal(); }
+function openModalRaw(html){ openModalContent(html) }
+
+/* Utility: copy current url with ref */
+function copyReferral(){ navigator.clipboard?.writeText(getReferralLink()).then(()=>alert('Referral link copied')) }
+
+/* On load */
+enableWithdrawIfEligible();
+
+</script>
+</body>
+</html>
